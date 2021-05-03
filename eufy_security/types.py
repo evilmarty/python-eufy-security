@@ -92,6 +92,10 @@ class ParamType(Enum):
     CAMERA_UPGRADE_NOW = 1133
     SCHEDULE_MODE = 1257
     GUARD_MODE = 1224  # 0 - Away, 1 - Home, 63 - Disarmed, 2 - chedule
+    DEVICE_STATUS = 1131
+    BATTERY = 1101
+    CHARGING_STATUS = 2111
+    SENSOR_OPEN = 1550
 
     FLOODLIGHT_MANUAL_SWITCH = 1400
     FLOODLIGHT_MANUAL_BRIGHTNESS = 1401  # The range is 22-100
@@ -109,14 +113,26 @@ class ParamType(Enum):
     CAMERA_WIFI_RSSI = 1142
 
     CAMERA_MOTION_ZONES = 1204
+    CAMERA_OFF = 99904
+    IS_HOMEKIT_SECURE_VIDEO = 1285
+    CAMERA_NOTIFICATION_OPTIONS = 1710
+    RTSP_AUTHENTICATION = 1287
+    DEVICE_LIST_1 = 1158
+    DEVICE_LIST_2 = 1157
+
+    SENSOR_OPEN_STATUS_ALERT = 1290
+    SENSOR_DAILY_STATUS_CHECK = 1291
 
     # Set only params?
     PUSH_MSG_MODE = 1252  # 0 to ???
 
+    def use_base64(self):
+        return self in [SNOOZE_MODE, CAMERA_MOTION_ZONES, SENSOR_OPEN_STATUS_ALERT, SENSOR_DAILY_STATUS_CHECK]
+
     def read_value(self, value):
         """Read a parameter JSON string."""
         if value:
-            if self in [ParamType.SNOOZE_MODE, ParamType.CAMERA_MOTION_ZONES]:
+            if self.use_base64:
                 value = base64.b64decode(value, validate=True).decode()
             return json.loads(value)
         return None
@@ -124,7 +140,7 @@ class ParamType(Enum):
     def write_value(self, value):
         """Write a parameter JSON string."""
         value = json.dumps(value)
-        if self is ParamType.SNOOZE_MODE:
+        if self.use_base64:
             value = base64.b64encode(value.encode()).decode()
         return value
 
