@@ -48,6 +48,9 @@ class DeviceType(Enum):
     def is_station(self):
         return self in [DeviceType.DOORBELL, DeviceType.FLOODLIGHT, DeviceType.STATION]
 
+    def is_sensor(self):
+        return self in [DeviceType.MOTION_SENSOR, DeviceType.SENSOR]
+
 
 class ParamType(Enum):
     """

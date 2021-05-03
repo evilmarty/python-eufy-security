@@ -7,6 +7,7 @@ from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientError
 
 from .camera import Camera
+from .sensor import Sensor
 from .errors import InvalidCredentialsError, RequestError, raise_error
 from .station import Station
 from .types import DeviceType
@@ -30,6 +31,7 @@ class API:  # pylint: disable=too-many-instance-attributes
         self._token_expiration: Optional[datetime] = None
 
         self.cameras: Dict[str, Camera] = {}
+        self.sensors: Dict[str, Sensor] = {}
         self.stations: Dict[str, Station] = {}
 
     async def async_authenticate(self) -> None:
@@ -67,6 +69,9 @@ class API:  # pylint: disable=too-many-instance-attributes
             if device_type.is_camera():
                 devices = self.cameras
                 device_class = Camera
+            elif device_type.is_sensor():
+                devices = self.sensors
+                device_class = Sensor
             else:
                 continue
 
