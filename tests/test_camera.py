@@ -26,6 +26,14 @@ async def test_properties(aresponses, login_success_response):
             text=load_fixture("devices_list_response.json"), status=200
         ),
     )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(
+            text=load_fixture("hub_list_response.json"), status=200
+        ),
+    )
 
     async with aiohttp.ClientSession() as websession:
         api = await async_login(TEST_EMAIL, TEST_PASSWORD, websession)
@@ -55,6 +63,14 @@ async def test_start_stream(aresponses, login_success_response):
         "post",
         aresponses.Response(
             text=load_fixture("devices_list_response.json"), status=200
+        ),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(
+            text=load_fixture("hub_list_response.json"), status=200
         ),
     )
     aresponses.add(
@@ -92,6 +108,14 @@ async def test_stop_stream(aresponses, login_success_response):
     )
     aresponses.add(
         "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(
+            text=load_fixture("hub_list_response.json"), status=200
+        ),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
         "/v1/web/equipment/stop_stream",
         "post",
         aresponses.Response(text=load_fixture("stop_stream_response.json"), status=200),
@@ -122,10 +146,26 @@ async def test_update(aresponses, login_success_response):
     )
     aresponses.add(
         "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(
+            text=load_fixture("hub_list_response.json"), status=200
+        ),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
         "/v1/app/get_devs_list",
         "post",
         aresponses.Response(
             text=load_fixture("devices_list_response.json"), status=200
+        ),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(
+            text=load_fixture("hub_list_response.json"), status=200
         ),
     )
 
