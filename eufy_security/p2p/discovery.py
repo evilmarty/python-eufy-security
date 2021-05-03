@@ -52,7 +52,6 @@ class DiscoveryP2PClientProtocol(BaseP2PClientProtocol):
         payload: bytes,
         addr: Tuple[str, int],
     ):
-        msg = payload[2:]
         if msg_type == P2PClientProtocolResponseMessageType.LOOKUP_ADDR:
             port = payload[5] * 256 + payload[4]
             ip = f"{payload[9]}.{payload[8]}.{payload[7]}.{payload[6]}"

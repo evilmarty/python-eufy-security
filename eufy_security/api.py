@@ -7,8 +7,8 @@ from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientError
 
 from .camera import Camera
-from .sensor import Sensor
 from .errors import InvalidCredentialsError, RequestError, raise_error
+from .sensor import Sensor
 from .station import Station
 from .types import DeviceType
 

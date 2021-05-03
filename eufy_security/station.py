@@ -1,15 +1,14 @@
 """Define a Eufy station object."""
-import asyncio
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from async_generator import asynccontextmanager
 
+from .device import Device
 from .errors import EufySecurityP2PError
 from .p2p.session import P2PSession
 from .p2p.types import CommandType
-from .types import DeviceType, GuardMode, ParamType
-from .device import Device
+from .types import GuardMode
 
 if TYPE_CHECKING:
     from .api import API  # pylint: disable=cyclic-import

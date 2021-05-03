@@ -1,16 +1,17 @@
 import logging
 from typing import TYPE_CHECKING
 
+from async_generator import asynccontextmanager
+
 from .errors import EufySecurityP2PError
 from .p2p.session import P2PSession
 from .types import DeviceType, ParamType
-
-from async_generator import asynccontextmanager
 
 if TYPE_CHECKING:
     from .api import API  # pylint: disable=cyclic-import
 
 _LOGGER: logging.Logger = logging.getLogger(__name__)
+
 
 class Device:
     def __init__(self, api: "API", device_info: dict) -> None:

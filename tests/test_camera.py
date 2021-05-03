@@ -30,9 +30,7 @@ async def test_properties(aresponses, login_success_response):
         "security-app.eufylife.com",
         "/v1/app/get_hub_list",
         "post",
-        aresponses.Response(
-            text=load_fixture("hub_list_response.json"), status=200
-        ),
+        aresponses.Response(text=load_fixture("hub_list_response.json"), status=200),
     )
 
     async with aiohttp.ClientSession() as websession:
@@ -69,9 +67,7 @@ async def test_start_stream(aresponses, login_success_response):
         "security-app.eufylife.com",
         "/v1/app/get_hub_list",
         "post",
-        aresponses.Response(
-            text=load_fixture("hub_list_response.json"), status=200
-        ),
+        aresponses.Response(text=load_fixture("hub_list_response.json"), status=200),
     )
     aresponses.add(
         "security-app.eufylife.com",
@@ -110,9 +106,7 @@ async def test_stop_stream(aresponses, login_success_response):
         "security-app.eufylife.com",
         "/v1/app/get_hub_list",
         "post",
-        aresponses.Response(
-            text=load_fixture("hub_list_response.json"), status=200
-        ),
+        aresponses.Response(text=load_fixture("hub_list_response.json"), status=200),
     )
     aresponses.add(
         "security-app.eufylife.com",
@@ -148,9 +142,7 @@ async def test_update(aresponses, login_success_response):
         "security-app.eufylife.com",
         "/v1/app/get_hub_list",
         "post",
-        aresponses.Response(
-            text=load_fixture("hub_list_response.json"), status=200
-        ),
+        aresponses.Response(text=load_fixture("hub_list_response.json"), status=200),
     )
     aresponses.add(
         "security-app.eufylife.com",
@@ -164,9 +156,7 @@ async def test_update(aresponses, login_success_response):
         "security-app.eufylife.com",
         "/v1/app/get_hub_list",
         "post",
-        aresponses.Response(
-            text=load_fixture("hub_list_response.json"), status=200
-        ),
+        aresponses.Response(text=load_fixture("hub_list_response.json"), status=200),
     )
 
     async with aiohttp.ClientSession() as websession:

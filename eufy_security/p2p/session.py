@@ -1,6 +1,5 @@
 import asyncio
 from collections import defaultdict
-from enum import Enum
 import ipaddress
 import logging
 import math

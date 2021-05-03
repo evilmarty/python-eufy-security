@@ -2,10 +2,10 @@
 import logging
 from typing import TYPE_CHECKING
 
+from .device import Device
 from .p2p.session import P2PSession
 from .p2p.types import CommandType
 from .types import DeviceType, ParamType
-from .device import Device
 
 if TYPE_CHECKING:
     from .api import API  # pylint: disable=cyclic-import

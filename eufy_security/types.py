@@ -127,7 +127,12 @@ class ParamType(Enum):
     PUSH_MSG_MODE = 1252  # 0 to ???
 
     def use_base64(self):
-        return self in [SNOOZE_MODE, CAMERA_MOTION_ZONES, SENSOR_OPEN_STATUS_ALERT, SENSOR_DAILY_STATUS_CHECK]
+        return self in [
+            ParamType.SNOOZE_MODE,
+            ParamType.CAMERA_MOTION_ZONES,
+            ParamType.SENSOR_OPEN_STATUS_ALERT,
+            ParamType.SENSOR_DAILY_STATUS_CHECK,
+        ]
 
     def read_value(self, value):
         """Read a parameter JSON string."""
