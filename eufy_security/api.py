@@ -57,35 +57,36 @@ class API:  # pylint: disable=too-many-instance-attributes
 
     async def async_update_device_info(self) -> None:
         """Get the latest device info."""
-        # Cameras
         devices_resp = await self.request("post", "app/get_devs_list")
 
-        if not devices_resp.get("data"):
-            return
+        for device_info in devices_resp.get("data", []):
+            devices = None
+            device_class = None
+            device_type = DeviceType(device_info["device_type"])
 
-        for device_info in devices_resp["data"]:
-            if DeviceType(device_info["device_type"]).is_camera():
-                if device_info["device_sn"] in self.cameras:
-                    camera = self.cameras[device_info["device_sn"]]
-                    camera.camera_info = device_info
-                    continue
-                self.cameras[device_info["device_sn"]] = Camera.from_info(
-                    self, device_info
-                )
+            if device_type.is_camera():
+                devices = self.cameras
+                device_class = Camera
+            else:
+                continue
+
+            device_sn = device_info["device_sn"]
+            if device_sn in devices:
+                devices[device_sn].device_info = device_info
+            else:
+                devices[device_sn] = device_class.from_info(self, device_info)
 
         # Stations
         stations_resp = await self.request("post", "app/get_hub_list")
 
-        if not stations_resp.get("data"):
-            return
-
-        for device_info in stations_resp["data"]:
-            if DeviceType(device_info["device_type"]).is_station():
-                if device_info["station_sn"] in self.stations:
-                    station = self.stations[device_info["station_sn"]]
-                    station.station_info = device_info
-                    continue
-                self.stations[device_info["station_sn"]] = Station(self, device_info)
+        for device_info in stations_resp.get("data", []):
+            device_type = DeviceType(device_info["device_type"])
+            if device_type.is_station():
+                station_sn = device_info["station_sn"]
+                if device_sn in self.stations:
+                    self.stations[station_sn].device_info = device_info
+                else:
+                    self.stations[station_sn] = Station.from_info(self, device_info)
 
     async def request(
         self,
