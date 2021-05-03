@@ -45,7 +45,3 @@ repos:
     rev: v2.4.0
     hooks:
       - id: check-json
-      - id: no-commit-to-branch
-        args:
-          - --branch=dev
-          - --branch=master
