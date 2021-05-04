@@ -67,12 +67,11 @@ class Device:
             value = param["param_value"]
             try:
                 param_type = ParamType(param_type)
-                value = param_type.read_value(value)
+                params[param_type] = param_type.read_value(value)
             except ValueError:
                 _LOGGER.debug(
                     'Unable to process parameter "%s", value "%s"', param_type, value
                 )
-            params[param_type] = value
         return params
 
     async def async_set_params(self, params: dict) -> None:
