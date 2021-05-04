@@ -32,6 +32,11 @@ class Camera(Device):
         """Return the URL to the latest camera thumbnail."""
         return self.device_info["cover_path"]
 
+    @property
+    def motion_detection_enabled(self):
+        """Return the status of motion detection."""
+        return bool(self.params[ParamType.DETECT_SWITCH])
+
     async def async_start_detection(self):
         """Start camera detection."""
         await self.async_set_params({ParamType.DETECT_SWITCH: 1})

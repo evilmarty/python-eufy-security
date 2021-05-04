@@ -8,7 +8,7 @@ from .device import Device
 from .errors import EufySecurityP2PError
 from .p2p.session import P2PSession
 from .p2p.types import CommandType
-from .types import GuardMode
+from .types import GuardMode, ParamType
 
 if TYPE_CHECKING:
     from .api import API  # pylint: disable=cyclic-import
@@ -77,6 +77,14 @@ class Station(Device):
     def ip(self) -> str:
         """Return the station's ip."""
         return self.device_info["ip_addr"]
+
+    @property
+    def guard_mode(self):
+        """Return the station's guard mode."""
+        try:
+            return GuardMode(self.params[ParamType.GUARD_MODE])
+        except ValueError:
+            return None
 
     async def set_guard_mode(self, mode: GuardMode, session: P2PSession = None) -> None:
         async with self.async_establish_session(session) as session:

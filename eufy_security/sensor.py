@@ -3,7 +3,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from .device import Device
-from .types import DeviceType
+from .types import DeviceType, ParamType
 
 if TYPE_CHECKING:
     from .api import API  # pylint: disable=cyclic-import
@@ -22,6 +22,11 @@ class Sensor(Device):
         else:
             klass = Sensor
         return klass(api, sensor_info)
+
+    @property
+    def is_on(self):
+        """Return the status of the sensor."""
+        return bool(self.params[ParamType.SENSOR_OPEN])
 
 
 class MotionSensor(Sensor):
