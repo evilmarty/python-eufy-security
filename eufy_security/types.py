@@ -155,3 +155,4 @@ class GuardMode(Enum):
     HOME = 1
     DISARMED = 63
     SCHEDULE = 2
+    GEOFENCING = 47
