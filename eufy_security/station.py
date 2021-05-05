@@ -86,8 +86,54 @@ class Station(Device):
         except ValueError:
             return None
 
+    @property
+    def away_mode(self):
+        """Return whether the station is in away mode."""
+        return self.guard_mode == GuardMode.AWAY
+
+    @property
+    def home_mode(self):
+        """Return whether the station is in home mode."""
+        return self.guard_mode == GuardMode.HOME
+
+    @property
+    def disarmed_mode(self):
+        """Return whether the station is in disarmed mode."""
+        return self.guard_mode == GuardMode.DISARMED
+
+    @property
+    def schedule_mode(self):
+        """Return whether the station is in schedule mode."""
+        return self.guard_mode == GuardMode.SCHEDULE
+
+    @property
+    def geofencing_mode(self):
+        """Return whether the station is in geofencing mode."""
+        return self.guard_mode == GuardMode.GEOFENCING
+
     async def set_guard_mode(self, mode: GuardMode, session: P2PSession = None) -> None:
+        """Set station guard mode."""
         async with self.async_establish_session(session) as session:
             await session.async_send_command_with_int(
                 0, CommandType.CMD_SET_ARMING, mode.value
             )
+
+    async def set_away_mode(self, session: P2PSession = None) -> None:
+        """Set station guard mode to away."""
+        await self.set_guard_mode(GuardMode.AWAY, session)
+
+    async def set_home_mode(self, session: P2PSession = None) -> None:
+        """Set station guard mode to home."""
+        await self.set_guard_mode(GuardMode.HOME, session)
+
+    async def set_disarmed_mode(self, session: P2PSession = None) -> None:
+        """Set station guard mode to disarmed."""
+        await self.set_guard_mode(GuardMode.DISARMED, session)
+
+    async def set_schedule_mode(self, session: P2PSession = None) -> None:
+        """set station guard mode to schedule."""
+        await self.set_guard_mode(GuardMode.SCHEDULE, session)
+
+    async def set_geofencing_mode(self, session: P2PSession = None) -> None:
+        """set station guard mode to geofencing."""
+        await self.set_guard_mode(GuardMode.GEOFENCING, session)
