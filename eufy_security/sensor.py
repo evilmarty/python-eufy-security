@@ -26,7 +26,7 @@ class Sensor(Device):
     @property
     def is_on(self):
         """Return the status of the sensor."""
-        return bool(self.params[ParamType.SENSOR_OPEN])
+        return bool(self.params.get(ParamType.SENSOR_OPEN, None))
 
 
 class MotionSensor(Sensor):
