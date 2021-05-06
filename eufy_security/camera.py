@@ -35,7 +35,15 @@ class Camera(Device):
     @property
     def motion_detection_enabled(self):
         """Return the status of motion detection."""
-        return bool(self.params[ParamType.DETECT_SWITCH])
+        return bool(self.params.get(ParamType.CAMERA_PIR, None))
+
+    async def async_enable_motion_detection(self):
+        """Enable the camera's motion detection."""
+        await self.async_set_params({ParamType.CAMERA_PIR: 1})
+
+    async def async_disable_motion_detection(self):
+        """Disable the camera's motion detection."""
+        await self.async_set_params({ParamType.CAMERA_PIR: 0})
 
     async def async_start_detection(self):
         """Start camera detection."""
