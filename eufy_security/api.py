@@ -29,6 +29,7 @@ class API:  # pylint: disable=too-many-instance-attributes
         self._session: ClientSession = websession
         self._token: Optional[str] = None
         self._token_expiration: Optional[datetime] = None
+        self._listeners = []
 
         self.cameras: Dict[str, Camera] = {}
         self.sensors: Dict[str, Sensor] = {}
@@ -93,6 +94,8 @@ class API:  # pylint: disable=too-many-instance-attributes
                 else:
                     self.stations[station_sn] = Station.from_info(self, device_info)
 
+        self.dispatch(self)
+
     async def request(
         self,
         method: str,
@@ -141,6 +144,22 @@ class API:  # pylint: disable=too-many-instance-attributes
                 raise RequestError(
                     f"There was an unknown error while requesting {endpoint}: {err}"
                 ) from None
+
+    def subscribe(self, callback):
+        self._listeners.append(callback)
+
+        @callback
+        def remove_callback():
+            self.unsubscribe(callback)
+
+        return remove_callback
+
+    def unsubscribe(self, callback):
+        self._listeners.remove(callback)
+
+    def dispatch(self, *args, **kvargs):
+        for callback in self._listeners:
+            callback(*args, **kvargs)
 
 
 def _raise_on_error(data: dict) -> None:

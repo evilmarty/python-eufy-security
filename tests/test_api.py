@@ -1,6 +1,7 @@
 """Define tests for the base API."""
 from datetime import datetime, timedelta
 import json
+from unittest.mock import Mock
 
 import aiohttp
 import pytest
@@ -270,3 +271,67 @@ async def test_login_success(aresponses, login_success_response):
         assert api._token is not None
         assert api._token_expiration is not None
         assert len(api.cameras) == 2
+
+
+@pytest.mark.asyncio
+async def test_callbacks(aresponses, login_success_response):
+    """Test api callbacks on update."""
+    aresponses.add(
+        "mysecurity.eufylife.com",
+        "/api/v1/passport/login",
+        "post",
+        aresponses.Response(text=json.dumps(login_success_response), status=200),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_devs_list",
+        "post",
+        aresponses.Response(
+            text=load_fixture("devices_list_response.json"), status=200
+        ),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(text=load_fixture("hub_list_response.json"), status=200),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_devs_list",
+        "post",
+        aresponses.Response(
+            text=load_fixture("devices_list_response.json"), status=200
+        ),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(text=load_fixture("hub_list_response.json"), status=200),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_devs_list",
+        "post",
+        aresponses.Response(
+            text=load_fixture("devices_list_response.json"), status=200
+        ),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(text=load_fixture("hub_list_response.json"), status=200),
+    )
+
+    async with aiohttp.ClientSession() as websession:
+        callback = Mock()
+        api = await async_login(TEST_EMAIL, TEST_PASSWORD, websession)
+        cancel = api.subscribe(callback)
+        await api.async_update_device_info()
+        callback.assert_called_with(api)
+        api.unsubscribe(callback)
+        callback.reset_mock()
+        await api.async_update_device_info()
+        callback.assert_not_called()
