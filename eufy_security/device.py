@@ -74,6 +74,11 @@ class Device:
                 )
         return params
 
+    @property
+    def battery_level(self) -> int:
+        """Return the device's battery level."""
+        return self.params.get(ParamType.BATTERY_LEVEL, None)
+
     async def async_set_params(self, params: dict) -> None:
         """Set device parameters."""
         serialized_params = []

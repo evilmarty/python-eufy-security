@@ -93,7 +93,7 @@ class ParamType(Enum):
     SCHEDULE_MODE = 1257
     GUARD_MODE = 1224  # 0 - Away, 1 - Home, 63 - Disarmed, 2 - chedule
     DEVICE_STATUS = 1131
-    BATTERY = 1101
+    BATTERY_LEVEL = 1101
     CHARGING_STATUS = 2111
     SENSOR_OPEN = 1550
 
