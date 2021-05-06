@@ -47,6 +47,37 @@ async def test_properties(aresponses, login_success_response):
 
 
 @pytest.mark.asyncio
+async def test_params(aresponses, login_success_response):
+    """Test camera parameters."""
+    aresponses.add(
+        "mysecurity.eufylife.com",
+        "/api/v1/passport/login",
+        "post",
+        aresponses.Response(text=json.dumps(login_success_response), status=200),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_devs_list",
+        "post",
+        aresponses.Response(
+            text=load_fixture("devices_list_response.json"), status=200
+        ),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(text=load_fixture("hub_list_response.json"), status=200),
+    )
+
+    async with aiohttp.ClientSession() as websession:
+        api = await async_login(TEST_EMAIL, TEST_PASSWORD, websession)
+        camera = list(api.cameras.values())[0]
+        print(camera.params)
+        assert camera.motion_detection_enabled == True
+
+
+@pytest.mark.asyncio
 async def test_start_stream(aresponses, login_success_response):
     """Test starting the RTSP stream."""
     aresponses.add(

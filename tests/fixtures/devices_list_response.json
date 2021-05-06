@@ -73,6 +73,15 @@
         {
           "param_id": 0,
           "device_sn": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx1",
+          "param_type": 2027,
+          "param_value": "1",
+          "create_time": 1546718455,
+          "update_time": 0,
+          "status": 1
+        },
+        {
+          "param_id": 0,
+          "device_sn": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx1",
           "param_type": 1015,
           "param_value": "0",
           "create_time": 1546718455,

@@ -126,6 +126,7 @@ class ParamType(Enum):
     # Set only params?
     PUSH_MSG_MODE = 1252  # 0 to ???
 
+    @property
     def use_base64(self):
         return self in [
             ParamType.SNOOZE_MODE,
@@ -140,7 +141,8 @@ class ParamType(Enum):
             if self.use_base64:
                 value = base64.b64decode(value, validate=True).decode()
             return json.loads(value)
-        return None
+        else:
+            return None
 
     def write_value(self, value):
         """Write a parameter JSON string."""
