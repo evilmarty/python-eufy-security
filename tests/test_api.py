@@ -335,3 +335,63 @@ async def test_callbacks(aresponses, login_success_response):
         callback.reset_mock()
         await api.async_update_device_info()
         callback.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_update_cameras(aresponses, login_success_response):
+    """Test api updating cameras."""
+    dev_list_resp = load_fixture("devices_list_response.json")
+    hub_list_resp = load_fixture("hub_list_response.json")
+
+    updated_dev_list_resp = json.loads(dev_list_resp)
+    for item in updated_dev_list_resp["data"]:
+        item["main_sw_version"] = "updated"
+
+    updated_hub_list_resp = json.loads(hub_list_resp)
+    for item in updated_hub_list_resp["data"]:
+        item["main_sw_version"] = "updated"
+
+    aresponses.add(
+        "mysecurity.eufylife.com",
+        "/api/v1/passport/login",
+        "post",
+        aresponses.Response(text=json.dumps(login_success_response), status=200),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_devs_list",
+        "post",
+        aresponses.Response(text=dev_list_resp, status=200),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(text=hub_list_resp, status=200),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_devs_list",
+        "post",
+        aresponses.Response(text=json.dumps(updated_dev_list_resp), status=200),
+    )
+    aresponses.add(
+        "security-app.eufylife.com",
+        "/v1/app/get_hub_list",
+        "post",
+        aresponses.Response(text=json.dumps(updated_hub_list_resp), status=200),
+    )
+
+    async with aiohttp.ClientSession() as websession:
+        api = await async_login(TEST_EMAIL, TEST_PASSWORD, websession)
+        camera = next(iter(api.cameras.values()))
+        station = next(iter(api.stations.values()))
+
+        camera_version = camera.software_version
+        station_version = station.software_version
+        assert camera_version is not None
+        assert station_version is not None
+
+        await api.async_update_device_info()
+        assert camera.software_version != camera_version
+        assert station.software_version != station_version

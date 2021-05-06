@@ -63,24 +63,14 @@ class API:  # pylint: disable=too-many-instance-attributes
         devices_resp = await self.request("post", "app/get_devs_list")
 
         for device_info in devices_resp.get("data", []):
-            devices = None
-            device_class = None
             device_type = DeviceType(device_info["device_type"])
 
             if device_type.is_camera():
-                devices = self.cameras
-                device_class = Camera
+                self._add_or_update_device(self.cameras, device_info, Camera)
             elif device_type.is_sensor():
-                devices = self.sensors
-                device_class = Sensor
+                self._add_or_update_device(self.sensors, device_info, Sensor)
             else:
                 continue
-
-            device_sn = device_info["device_sn"]
-            if device_sn in devices:
-                devices[device_sn].device_info = device_info
-            else:
-                devices[device_sn] = device_class.from_info(self, device_info)
 
         # Stations
         stations_resp = await self.request("post", "app/get_hub_list")
@@ -88,13 +78,21 @@ class API:  # pylint: disable=too-many-instance-attributes
         for device_info in stations_resp.get("data", []):
             device_type = DeviceType(device_info["device_type"])
             if device_type.is_station():
-                station_sn = device_info["station_sn"]
-                if device_sn in self.stations:
-                    self.stations[station_sn].device_info = device_info
-                else:
-                    self.stations[station_sn] = Station.from_info(self, device_info)
+                self._add_or_update_device(
+                    self.stations, device_info, Station, "station_sn"
+                )
 
         self.dispatch(self)
+
+    def _add_or_update_device(
+        self, devices, device_info, device_class, id_key="device_sn"
+    ):
+        device_id = device_info[id_key]
+        device = devices.get(device_id)
+        if device:
+            device.update(device_info)
+        else:
+            devices[device_id] = device_class.from_info(self, device_info)
 
     async def request(
         self,

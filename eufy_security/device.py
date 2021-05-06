@@ -102,6 +102,9 @@ class Device:
         """Get the latest values for the camera's properties."""
         await self._api.async_update_device_info()
 
+    def update(self, device_info):
+        self.device_info = device_info
+
     @asynccontextmanager
     async def async_establish_session(self, session: P2PSession = None):
         if session and session.valid_for(self.station_serial):
