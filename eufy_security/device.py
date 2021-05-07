@@ -67,7 +67,7 @@ class Device:
             value = param["param_value"]
             try:
                 param_type = ParamType(param_type)
-                params[param_type] = param_type.read_value(value)
+                params[param_type] = param_type.load(value)
             except ValueError:
                 _LOGGER.debug(
                     'Unable to process parameter "%s", value "%s"', param_type, value
@@ -84,7 +84,7 @@ class Device:
         serialized_params = []
         for param_type, value in params.items():
             if isinstance(param_type, ParamType):
-                value = param_type.write_value(value)
+                value = param_type.dump(value)
                 param_type = param_type.value
             serialized_params.append({"param_type": param_type, "param_value": value})
         await self._api.request(

@@ -52,10 +52,68 @@ class DeviceType(Enum):
         return self in [DeviceType.MOTION_SENSOR, DeviceType.SENSOR]
 
 
+class JsonConverter:
+    """
+    Converts values to and from JSON.
+    """
+
+    @staticmethod
+    def load(value):
+        return json.loads(value)
+
+    @staticmethod
+    def dump(value):
+        return json.dumps(value)
+
+
+class BoolConverter:
+    """
+    Converts boolean-like values.
+    """
+
+    @staticmethod
+    def load(value):
+        return bool(JsonConverter.load(value))
+
+    @staticmethod
+    def dump(value):
+        return JsonConverter.dump(int(value))
+
+
+class Base64Converter:
+    """
+    Wraps and unwraps base64 values then converts to and from JSON.
+    """
+
+    @staticmethod
+    def load(value):
+        decoded_value = base64.b64decode(value, validate=True).decode()
+        return JsonConverter.load(decoded_value)
+
+    @staticmethod
+    def dump(value):
+        encoded_value = JsonConverter.dump(value)
+        return base64.b64encode(encoded_value.encode()).decode()
+
+
 class ParamType(Enum):
     """
     List retrieved from com.oceanwing.battery.cam.binder.model.CameraParams
     """
+
+    def __new__(cls, value, converter=JsonConverter):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj._converter_ = converter
+        return obj
+
+    def load(self, value):
+        """Deserialize the value for the parameter."""
+        return self._converter_.load(value)
+
+    def dump(self, value):
+        """Serialize the value for the parameter."""
+        return self._converter_.dump(value)
 
     CHIME_STATE = 2015
     DETECT_EXPOSURE = 2023
@@ -86,18 +144,18 @@ class ParamType(Enum):
     VOLUME = 2003
 
     # Inferred from source
-    SNOOZE_MODE = 1271  # The value is base64 encoded
+    SNOOZE_MODE = 1271, Base64Converter
     WATERMARK_MODE = 1214  # 1 - hide, 2 - show
     DEVICE_UPGRADE_NOW = 1134
     CAMERA_UPGRADE_NOW = 1133
     SCHEDULE_MODE = 1257
     GUARD_MODE = 1224  # 0 - Away, 1 - Home, 63 - Disarmed, 2 - chedule
-    DEVICE_STATUS = 1131
+    DEVICE_STATUS = 1131, BoolConverter
     BATTERY_LEVEL = 1101
     CHARGING_STATUS = 2111
-    SENSOR_OPEN = 1550
+    SENSOR_OPEN = 1550, BoolConverter
 
-    FLOODLIGHT_MANUAL_SWITCH = 1400
+    FLOODLIGHT_MANUAL_SWITCH = 1400, BoolConverter
     FLOODLIGHT_MANUAL_BRIGHTNESS = 1401  # The range is 22-100
     FLOODLIGHT_MOTION_BRIGHTNESS = 1412  # The range is 22-100
     FLOODLIGHT_SCHEDULE_BRIGHTNESS = 1413  # The range is 22-100
@@ -109,47 +167,22 @@ class ParamType(Enum):
     CAMERA_RECORD_CLIP_LENGTH = 1249  # In seconds
 
     CAMERA_IR_CUT = 1013
-    CAMERA_PIR = 1011
+    CAMERA_PIR = 1011, BoolConverter
     CAMERA_WIFI_RSSI = 1142
 
-    CAMERA_MOTION_ZONES = 1204
-    CAMERA_OFF = 99904
+    CAMERA_MOTION_ZONES = 1204, Base64Converter
+    CAMERA_OFF = 99904, BoolConverter
     IS_HOMEKIT_SECURE_VIDEO = 1285
     CAMERA_NOTIFICATION_OPTIONS = 1710
     RTSP_AUTHENTICATION = 1287
-    DEVICE_LIST_1 = 1158
-    DEVICE_LIST_2 = 1157
+    DEVICE_LIST_1 = 1158, Base64Converter
+    DEVICE_LIST_2 = 1157, Base64Converter
 
-    SENSOR_OPEN_STATUS_ALERT = 1290
-    SENSOR_DAILY_STATUS_CHECK = 1291
+    SENSOR_OPEN_STATUS_ALERT = 1290, Base64Converter
+    SENSOR_DAILY_STATUS_CHECK = 1291, Base64Converter
 
     # Set only params?
     PUSH_MSG_MODE = 1252  # 0 to ???
-
-    @property
-    def use_base64(self):
-        return self in [
-            ParamType.SNOOZE_MODE,
-            ParamType.CAMERA_MOTION_ZONES,
-            ParamType.SENSOR_OPEN_STATUS_ALERT,
-            ParamType.SENSOR_DAILY_STATUS_CHECK,
-        ]
-
-    def read_value(self, value):
-        """Read a parameter JSON string."""
-        if value:
-            if self.use_base64:
-                value = base64.b64decode(value, validate=True).decode()
-            return json.loads(value)
-        else:
-            return None
-
-    def write_value(self, value):
-        """Write a parameter JSON string."""
-        value = json.dumps(value)
-        if self.use_base64:
-            value = base64.b64encode(value.encode()).decode()
-        return value
 
 
 class GuardMode(Enum):
