@@ -65,9 +65,9 @@ class API:  # pylint: disable=too-many-instance-attributes
         for device_info in devices_resp.get("data", []):
             device_type = DeviceType(device_info["device_type"])
 
-            if device_type.is_camera():
+            if device_type.is_camera:
                 self._add_or_update_device(self.cameras, device_info, Camera)
-            elif device_type.is_sensor():
+            elif device_type.is_sensor:
                 self._add_or_update_device(self.sensors, device_info, Sensor)
             else:
                 continue
@@ -77,7 +77,7 @@ class API:  # pylint: disable=too-many-instance-attributes
 
         for device_info in stations_resp.get("data", []):
             device_type = DeviceType(device_info["device_type"])
-            if device_type.is_station():
+            if device_type.is_station:
                 self._add_or_update_device(
                     self.stations, device_info, Station, "station_sn"
                 )

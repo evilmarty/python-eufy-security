@@ -26,12 +26,14 @@ class DeviceType(Enum):
     SENSOR = 2
     STATION = 0
 
+    @property
     def is_doorbell(self):
         return self in [
             DeviceType.BATTERY_DOORBELL,
             DeviceType.DOORBELL,
         ]
 
+    @property
     def is_camera(self):
         return self in [
             DeviceType.BATTERY_DOORBELL,
@@ -45,9 +47,11 @@ class DeviceType(Enum):
             DeviceType.INDOOR_PT_CAMERA,
         ]
 
+    @property
     def is_station(self):
         return self in [DeviceType.DOORBELL, DeviceType.FLOODLIGHT, DeviceType.STATION]
 
+    @property
     def is_sensor(self):
         return self in [DeviceType.MOTION_SENSOR, DeviceType.SENSOR]
 
