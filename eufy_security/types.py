@@ -2,6 +2,9 @@
 import base64
 from enum import Enum
 import json
+import logging
+
+_LOGGER: logging.Logger = logging.getLogger(__name__)
 
 
 class DeviceType(Enum):
@@ -195,3 +198,31 @@ class GuardMode(Enum):
     DISARMED = 63
     SCHEDULE = 2
     GEOFENCING = 47
+
+
+class ParamDict(dict):
+    def __init__(self, params):
+        super().__init__()
+        self.update(params)
+
+    def __getitem__(self, key):
+        if type(key) == str:
+            key = ParamType[key]
+        elif not isinstance(key, ParamType):
+            key = ParamType(key)
+
+        return super().__getitem__(key)
+
+    def update(self, params):
+        updateable_params = {}
+        for param in list(params):
+            param_type = param["param_type"]
+            value = param["param_value"]
+            try:
+                param_type = ParamType(param_type)
+                updateable_params[param_type] = param_type.load(value)
+            except ValueError:
+                _LOGGER.debug(
+                    'Unable to process parameter "%s", value "%s"', param_type, value
+                )
+        super().update(updateable_params)

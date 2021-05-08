@@ -5,7 +5,7 @@ from async_generator import asynccontextmanager
 
 from .errors import EufySecurityP2PError
 from .p2p.session import P2PSession
-from .types import DeviceType, ParamType
+from .types import DeviceType, ParamType, ParamDict
 
 if TYPE_CHECKING:
     from .api import API  # pylint: disable=cyclic-import
@@ -61,18 +61,7 @@ class Device:
     @property
     def params(self) -> dict:
         """Return device parameters."""
-        params = {}
-        for param in self.device_info["params"]:
-            param_type = param["param_type"]
-            value = param["param_value"]
-            try:
-                param_type = ParamType(param_type)
-                params[param_type] = param_type.load(value)
-            except ValueError:
-                _LOGGER.debug(
-                    'Unable to process parameter "%s", value "%s"', param_type, value
-                )
-        return params
+        return ParamDict(self.device_info["params"])
 
     async def async_set_params(self, params: dict) -> None:
         """Set device parameters."""
