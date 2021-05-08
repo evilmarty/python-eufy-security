@@ -59,6 +59,20 @@ class DeviceType(Enum):
         return self in [DeviceType.MOTION_SENSOR, DeviceType.SENSOR]
 
 
+class StringConverter:
+    """
+    Converts values to and from String.
+    """
+
+    @staticmethod
+    def load(value):
+        return str(value)
+
+    @staticmethod
+    def dump(value):
+        return str(value)
+
+
 class JsonConverter:
     """
     Converts values to and from JSON.

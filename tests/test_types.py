@@ -8,6 +8,15 @@ from eufy_security.types import ParamDict, ParamType
 
 from .common import load_fixture
 
+
+def test_param_type_load_with_string_converter():
+    assert ParamType.HUB_LAN_IP.load("foobar") == "foobar"
+
+
+def test_param_type_dump_with_string_converter():
+    assert ParamType.HUB_LAN_IP.dump(123) == "123"
+
+
 def test_param_type_load_with_json_converter():
     assert ParamType.CHIME_STATE.load("123") == 123
 
