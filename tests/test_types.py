@@ -52,7 +52,7 @@ def test_param_type_dump_with_base64_converter():
 def test_param_dict_initializes():
     data = json.loads(load_fixture("devices_list_response.json"))["data"][0]["params"]
     params = ParamDict(data)
-    assert len(params) == 11
+    assert len(params) == 25
 
 
 def test_param_dict_getitem_by_param_type():
