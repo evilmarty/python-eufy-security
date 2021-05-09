@@ -162,4 +162,4 @@ async def test_update(aresponses, login_success_response):
     async with aiohttp.ClientSession() as websession:
         api = await async_login(TEST_EMAIL, TEST_PASSWORD, websession)
         camera = list(api.cameras.values())[0]
-        await camera.async_update()
+        await camera.async_refresh()

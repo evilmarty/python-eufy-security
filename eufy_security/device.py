@@ -96,7 +96,7 @@ class Device:
 
         await self._api.async_device_update_params(self, serialized_params)
 
-    async def async_update(self) -> None:
+    async def async_refresh(self) -> None:
         """Get the latest values for the camera's properties."""
         await self._api.async_update_device_info()
 
