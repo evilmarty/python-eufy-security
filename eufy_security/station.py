@@ -1,6 +1,5 @@
 """Define a Eufy station object."""
 import logging
-from typing import TYPE_CHECKING
 
 from async_generator import asynccontextmanager
 
@@ -10,18 +9,11 @@ from .p2p.session import P2PSession
 from .p2p.types import CommandType
 from .types import GuardMode, ParamType
 
-if TYPE_CHECKING:
-    from .api import API  # pylint: disable=cyclic-import
-
 _LOGGER: logging.Logger = logging.getLogger(__name__)
 
 
 class Station(Device):
     """Define a station object (e.g. Homebase)."""
-
-    @staticmethod
-    def from_info(api: "API", station_info: dict) -> "Station":
-        return Station(api, station_info)
 
     @asynccontextmanager
     async def async_establish_session(self, session: P2PSession = None):
@@ -137,3 +129,15 @@ class Station(Device):
     async def set_geofencing_mode(self, session: P2PSession = None) -> None:
         """set station guard mode to geofencing."""
         await self.set_guard_mode(GuardMode.GEOFENCING, session)
+
+    async def async_update_params(self, params: dict) -> None:
+        """Set station's parameters."""
+        serialized_params = []
+        for param_type, value in params.items():
+            param_type = ParamType.lookup(param_type)
+            value = param_type.dump(value)
+            serialized_params.append(
+                {"param_type": param_type.value, "param_value": value}
+            )
+
+        await self._api.async_station_update_params(self, serialized_params)

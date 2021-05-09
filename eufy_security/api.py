@@ -95,7 +95,16 @@ class API:  # pylint: disable=too-many-instance-attributes
                 "params": params,
             },
         )
-        await self.async_update()
+        await self.async_update_device_info()
+
+    async def async_station_update_params(self, station: Station, params: list) -> None:
+        """Set hub parameters."""
+        await self.request(
+            "post",
+            "app/upload_hub_params",
+            json={"station_sn": station.serial, "params": params},
+        )
+        await self.async_update_device_info()
 
     async def async_start_stream(self, device: Device) -> str:
         """Start the camera stream and return the RTSP URL."""
