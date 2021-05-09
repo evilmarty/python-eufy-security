@@ -14,7 +14,7 @@ _LOGGER: logging.Logger = logging.getLogger(__name__)
 
 
 class Device:
-    def __init__(self, api: "API", device_info: dict) -> None:
+    def __init__(self, api: "API", device_info: dict = {}) -> None:
         self._api = api
         self.device_info = device_info
 
@@ -116,3 +116,18 @@ class Device:
                 return
         else:
             raise EufySecurityP2PError(f"Could not find station for {self.name}")
+
+
+class DeviceDict(dict):
+    def __init__(self, api, item_class=Device, item_key="device_sn"):
+        super().__init__()
+        self.api = api
+        self.item_class = item_class
+        self.item_key = item_key
+
+    def update(self, devices):
+        for data in devices:
+            key = data[self.item_key]
+            if key not in devices:
+                self[key] = Device(self.api)
+            self[key].update(data)
