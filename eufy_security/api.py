@@ -6,11 +6,9 @@ from typing import Dict, Optional
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientError
 
-from .camera import Camera
+from .device import Device
 from .errors import InvalidCredentialsError, RequestError, raise_error
-from .sensor import Sensor
 from .station import Station
-from .types import DeviceType
 
 _LOGGER: logging.Logger = logging.getLogger(__name__)
 
@@ -31,9 +29,26 @@ class API:  # pylint: disable=too-many-instance-attributes
         self._token_expiration: Optional[datetime] = None
         self._listeners = []
 
-        self.cameras: Dict[str, Camera] = {}
-        self.sensors: Dict[str, Sensor] = {}
+        self.devices: Dict[str, Device] = {}
         self.stations: Dict[str, Station] = {}
+
+    @property
+    def cameras(self):
+        """Return a dict of cameras."""
+        return {
+            id: device
+            for id, device in self.devices.items()
+            if device.device_type.is_camera
+        }
+
+    @property
+    def sensors(self):
+        """Return a dict of cameras."""
+        return {
+            id: device
+            for id, device in self.devices.items()
+            if device.device_type.is_sensor
+        }
 
     async def async_authenticate(self) -> None:
         """Authenticate and get an access token."""
@@ -63,24 +78,15 @@ class API:  # pylint: disable=too-many-instance-attributes
         devices_resp = await self.request("post", "app/get_devs_list")
 
         for device_info in devices_resp.get("data", []):
-            device_type = DeviceType(device_info["device_type"])
-
-            if device_type.is_camera:
-                self._add_or_update_device(self.cameras, device_info, Camera)
-            elif device_type.is_sensor:
-                self._add_or_update_device(self.sensors, device_info, Sensor)
-            else:
-                continue
+            self._add_or_update_device(self.devices, device_info, Device)
 
         # Stations
         stations_resp = await self.request("post", "app/get_hub_list")
 
         for device_info in stations_resp.get("data", []):
-            device_type = DeviceType(device_info["device_type"])
-            if device_type.is_station:
-                self._add_or_update_device(
-                    self.stations, device_info, Station, "station_sn"
-                )
+            self._add_or_update_device(
+                self.stations, device_info, Station, "station_sn"
+            )
 
         self.dispatch(self)
 
@@ -92,7 +98,7 @@ class API:  # pylint: disable=too-many-instance-attributes
         if device:
             device.update(device_info)
         else:
-            devices[device_id] = device_class.from_info(self, device_info)
+            devices[device_id] = device_class(self, device_info)
 
     async def request(
         self,

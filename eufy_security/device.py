@@ -5,7 +5,7 @@ from async_generator import asynccontextmanager
 
 from .errors import EufySecurityP2PError
 from .p2p.session import P2PSession
-from .types import DeviceType, ParamType, ParamDict
+from .types import DeviceType, ParamDict, ParamType
 
 if TYPE_CHECKING:
     from .api import API  # pylint: disable=cyclic-import
@@ -22,6 +22,11 @@ class Device:
     def device_type(self) -> str:
         """Return the device type."""
         return DeviceType(self.device_info["device_type"])
+
+    @property
+    def status(self) -> str:
+        """Return the device status."""
+        return self.device_info["status"]
 
     @property
     def hardware_version(self) -> str:
@@ -57,6 +62,37 @@ class Device:
     def station_serial(self) -> str:
         """Return the device's station serial number."""
         return self.device_info["station_sn"]
+
+    @property
+    def last_camera_image_url(self) -> str:
+        """Return the URL to the latest camera thumbnail."""
+        return self.device_info["cover_path"]
+
+    async def async_start_stream(self) -> str:
+        """Start the camera stream and return the RTSP URL."""
+        start_resp = await self._api.request(
+            "post",
+            "web/equipment/start_stream",
+            json={
+                "device_sn": self.serial,
+                "station_sn": self.station_serial,
+                "proto": 2,
+            },
+        )
+
+        return start_resp["data"]["url"]
+
+    async def async_stop_stream(self) -> None:
+        """Stop the camera stream."""
+        await self._api.request(
+            "post",
+            "web/equipment/stop_stream",
+            json={
+                "device_sn": self.serial,
+                "station_sn": self.station_serial,
+                "proto": 2,
+            },
+        )
 
     @property
     def params(self) -> dict:
