@@ -99,7 +99,10 @@ class Device:
         """Return device parameters."""
         return ParamDict(self.device_info["params"])
 
-    async def async_set_params(self, params: dict) -> None:
+    async def async_update_param(self, param_type: any, value: any) -> None:
+        await self.async_update_params({param_type: value})
+
+    async def async_update_params(self, params: dict) -> None:
         """Set device parameters."""
         serialized_params = []
         for param_type, value in params.items():
