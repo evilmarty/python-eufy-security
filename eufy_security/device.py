@@ -68,36 +68,18 @@ class Device:
         """Return the URL to the latest camera thumbnail."""
         return self.device_info["cover_path"]
 
-    async def async_start_stream(self) -> str:
-        """Start the camera stream and return the RTSP URL."""
-        start_resp = await self._api.request(
-            "post",
-            "web/equipment/start_stream",
-            json={
-                "device_sn": self.serial,
-                "station_sn": self.station_serial,
-                "proto": 2,
-            },
-        )
-
-        return start_resp["data"]["url"]
-
-    async def async_stop_stream(self) -> None:
-        """Stop the camera stream."""
-        await self._api.request(
-            "post",
-            "web/equipment/stop_stream",
-            json={
-                "device_sn": self.serial,
-                "station_sn": self.station_serial,
-                "proto": 2,
-            },
-        )
-
     @property
     def params(self) -> dict:
         """Return device parameters."""
         return ParamDict(self.device_info["params"])
+
+    async def async_start_stream(self) -> str:
+        """Start the camera stream and return the RTSP URL."""
+        return await self._api.async_start_stream(self)
+
+    async def async_stop_stream(self) -> None:
+        """Stop the camera stream."""
+        await self._api.async_stop_stream(self)
 
     async def async_update_param(self, param_type: any, value: any) -> None:
         await self.async_update_params({param_type: value})
@@ -112,16 +94,7 @@ class Device:
                 {"param_type": param_type.value, "param_value": value}
             )
 
-        await self._api.request(
-            "post",
-            "app/upload_devs_params",
-            json={
-                "device_sn": self.serial,
-                "station_sn": self.station_serial,
-                "params": serialized_params,
-            },
-        )
-        await self.async_update()
+        await self._api.async_device_update_params(self, serialized_params)
 
     async def async_update(self) -> None:
         """Get the latest values for the camera's properties."""

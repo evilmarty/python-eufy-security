@@ -100,6 +100,45 @@ class API:  # pylint: disable=too-many-instance-attributes
         else:
             devices[device_id] = device_class(self, device_info)
 
+    async def async_device_update_params(self, device: Device, params: list) -> None:
+        """Set device parameters."""
+        await self.request(
+            "post",
+            "app/upload_devs_params",
+            json={
+                "device_sn": device.serial,
+                "station_sn": device.station_serial,
+                "params": params,
+            },
+        )
+        await self.async_update()
+
+    async def async_start_stream(self, device: Device) -> str:
+        """Start the camera stream and return the RTSP URL."""
+        start_resp = await self.request(
+            "post",
+            "web/equipment/start_stream",
+            json={
+                "device_sn": device.serial,
+                "station_sn": device.station_serial,
+                "proto": 2,
+            },
+        )
+
+        return start_resp["data"]["url"]
+
+    async def async_stop_stream(self, device: Device) -> None:
+        """Stop the camera stream."""
+        await self.request(
+            "post",
+            "web/equipment/stop_stream",
+            json={
+                "device_sn": device.serial,
+                "station_sn": device.station_serial,
+                "proto": 2,
+            },
+        )
+
     async def request(
         self,
         method: str,
