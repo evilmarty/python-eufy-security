@@ -102,7 +102,7 @@ class Device:
 
     def update(self, device_info):
         """Update the device's device_info."""
-        self.device_info = device_info
+        self.device_info.update(device_info)
 
     @asynccontextmanager
     async def async_establish_session(self, session: P2PSession = None):
@@ -125,9 +125,11 @@ class DeviceDict(dict):
         self.item_class = item_class
         self.item_key = item_key
 
-    def update(self, devices):
+    def update(self, devices: list) -> None:
         for data in devices:
             key = data[self.item_key]
-            if key not in devices:
-                self[key] = Device(self.api)
-            self[key].update(data)
+            device = self.get(key)
+            if device:
+                device.update(data)
+            else:
+                self[key] = self.item_class(self.api, data)

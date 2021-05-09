@@ -1,12 +1,12 @@
 """Define a base object for interacting with the Eufy camera API."""
 from datetime import datetime
 import logging
-from typing import Dict, Optional
+from typing import Optional
 
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientError
 
-from .device import Device
+from .device import Device, DeviceDict
 from .errors import InvalidCredentialsError, RequestError, raise_error
 from .station import Station
 
@@ -29,8 +29,8 @@ class API:  # pylint: disable=too-many-instance-attributes
         self._token_expiration: Optional[datetime] = None
         self._listeners = []
 
-        self.devices: Dict[str, Device] = {}
-        self.stations: Dict[str, Station] = {}
+        self.devices = DeviceDict(self, Device, "device_sn")
+        self.stations = DeviceDict(self, Station, "station_sn")
 
     @property
     def cameras(self):
@@ -76,29 +76,13 @@ class API:  # pylint: disable=too-many-instance-attributes
     async def async_update_device_info(self) -> None:
         """Get the latest device info."""
         devices_resp = await self.request("post", "app/get_devs_list")
-
-        for device_info in devices_resp.get("data", []):
-            self._add_or_update_device(self.devices, device_info, Device)
+        self.devices.update(devices_resp["data"])
 
         # Stations
         stations_resp = await self.request("post", "app/get_hub_list")
-
-        for device_info in stations_resp.get("data", []):
-            self._add_or_update_device(
-                self.stations, device_info, Station, "station_sn"
-            )
+        self.stations.update(stations_resp["data"])
 
         self.dispatch(self)
-
-    def _add_or_update_device(
-        self, devices, device_info, device_class, id_key="device_sn"
-    ):
-        device_id = device_info[id_key]
-        device = devices.get(device_id)
-        if device:
-            device.update(device_info)
-        else:
-            devices[device_id] = device_class(self, device_info)
 
     async def async_device_update_params(self, device: Device, params: list) -> None:
         """Set device parameters."""
