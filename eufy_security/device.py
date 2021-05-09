@@ -103,10 +103,12 @@ class Device:
         """Set device parameters."""
         serialized_params = []
         for param_type, value in params.items():
-            if isinstance(param_type, ParamType):
-                value = param_type.dump(value)
-                param_type = param_type.value
-            serialized_params.append({"param_type": param_type, "param_value": value})
+            param_type = ParamType.lookup(param_type)
+            value = param_type.dump(value)
+            serialized_params.append(
+                {"param_type": param_type.value, "param_value": value}
+            )
+
         await self._api.request(
             "post",
             "app/upload_devs_params",

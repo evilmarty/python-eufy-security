@@ -122,6 +122,15 @@ class ParamType(Enum):
     List retrieved from com.oceanwing.battery.cam.binder.model.CameraParams
     """
 
+    @staticmethod
+    def lookup(name_or_value):
+        if isinstance(name_or_value, ParamType):
+            return name_or_value
+        if type(name_or_value) == str:
+            return ParamType[name_or_value]
+        else:
+            return ParamType(name_or_value)
+
     def __new__(cls, value, converter=JsonConverter):
         obj = object.__new__(cls)
         obj._value_ = value
@@ -280,12 +289,7 @@ class ParamDict(dict):
         self.update(params)
 
     def __getitem__(self, key):
-        if type(key) == str:
-            key = ParamType[key]
-        elif not isinstance(key, ParamType):
-            key = ParamType(key)
-
-        return super().__getitem__(key)
+        return super().__getitem__(ParamType.lookup(key))
 
     def update(self, params):
         updateable_params = {}
