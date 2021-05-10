@@ -38,19 +38,19 @@ def test_param_type_dump_with_json_converter():
 
 
 def test_param_type_load_with_bool_converter_for_true():
-    assert ParamType.SENSOR_OPEN.load("1") == True
+    assert ParamType.SENSOR_STATUS.load("1") == True
 
 
 def test_param_type_load_with_bool_converter_for_false():
-    assert ParamType.SENSOR_OPEN.load("0") == False
+    assert ParamType.SENSOR_STATUS.load("0") == False
 
 
 def test_param_type_dump_with_bool_converter_for_true():
-    assert ParamType.SENSOR_OPEN.dump(True) == "1"
+    assert ParamType.SENSOR_STATUS.dump(True) == "1"
 
 
 def test_param_type_dump_with_bool_converter_for_false():
-    assert ParamType.SENSOR_OPEN.dump(False) == "0"
+    assert ParamType.SENSOR_STATUS.dump(False) == "0"
 
 
 def test_param_type_load_with_base64_converter():

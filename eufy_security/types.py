@@ -183,7 +183,7 @@ class ParamType(Enum):
     DEVICE_STATUS = 1131, BoolConverter
     BATTERY_LEVEL = 1101
     CHARGING_STATUS = 2111
-    SENSOR_OPEN = 1550, BoolConverter
+    SENSOR_STATUS = 1550, BoolConverter
 
     FLOODLIGHT_MANUAL_SWITCH = 1400, BoolConverter
     FLOODLIGHT_MANUAL_BRIGHTNESS = 1401  # The range is 22-100
@@ -268,7 +268,7 @@ class ParamType(Enum):
     CUSTOM_MODE = 1256, Base64Converter
     HUB_LOGIG = 1140
 
-    SENSOR_OPEN_STATUS_ALERT = 1290, Base64Converter
+    SENSOR_STATUS_ALERT = 1290, Base64Converter
     SENSOR_DAILY_STATUS_CHECK = 1291, Base64Converter
 
     # Set only params?
