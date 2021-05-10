@@ -9,6 +9,18 @@ from eufy_security.types import ParamDict, ParamType
 from .common import load_fixture
 
 
+def test_param_type_lookup_by_instance():
+    assert ParamType.lookup(ParamType.CHIME_STATE) == ParamType.CHIME_STATE
+
+
+def test_param_type_lookup_by_name():
+    assert ParamType.lookup("CHIME_STATE") == ParamType.CHIME_STATE
+
+
+def test_param_type_lookup_by_value():
+    assert ParamType.lookup(2015) == ParamType.CHIME_STATE
+
+
 def test_param_type_load_with_string_converter():
     assert ParamType.HUB_LAN_IP.load("foobar") == "foobar"
 
