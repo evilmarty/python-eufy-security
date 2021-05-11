@@ -1,5 +1,6 @@
 """Define tests for types."""
 
+from datetime import datetime, timezone
 import json
 
 import pytest
@@ -59,6 +60,16 @@ def test_param_type_load_with_base64_converter():
 
 def test_param_type_dump_with_base64_converter():
     assert ParamType.SNOOZE_MODE.dump({"a": 1}) == "eyJhIjogMX0="
+
+
+def test_param_type_load_with_datetime_converter():
+    dt = datetime(2021, 5, 10, 21, 42, 5, tzinfo=timezone.utc)
+    assert ParamType.SENSOR_CHANGE_TIME.load("1620682925") == dt
+
+
+def test_param_type_dump_with_datetime_converter():
+    dt = datetime(2021, 5, 10, 21, 42, 5, tzinfo=timezone.utc)
+    assert ParamType.SENSOR_CHANGE_TIME.dump(dt) == "1620682925"
 
 
 def test_param_dict_initializes():

@@ -1,5 +1,6 @@
 """Define parameters that can be sent to the base station."""
 import base64
+from datetime import datetime, timezone
 from enum import Enum
 import json
 import logging
@@ -115,6 +116,20 @@ class Base64Converter:
     def dump(value):
         encoded_value = JsonConverter.dump(value)
         return base64.b64encode(encoded_value.encode()).decode()
+
+
+class DatetimeConverter:
+    """
+    Converts values to and from datetimes.
+    """
+
+    @staticmethod
+    def load(value):
+        return datetime.fromtimestamp(int(value), timezone.utc)
+
+    @staticmethod
+    def dump(value):
+        return str(int(value.replace(tzinfo=timezone.utc).timestamp()))
 
 
 class ParamType(Enum):
@@ -245,7 +260,7 @@ class ParamType(Enum):
     DEV_MIC_VOLUME = 1229
     LEAVING_DELAY_CUSTOM2 = 1174
     SENSOR_BAT_STATE = 1552
-    SENSOR_CHANGE_TIME = 1551
+    SENSOR_CHANGE_TIME = 1551, DatetimeConverter
     SENSOR_CHIRP_TONE = 1507
     SUB1G_RSSI = 1141
     SENSOR_CHIRP_VOLUME = 1508
